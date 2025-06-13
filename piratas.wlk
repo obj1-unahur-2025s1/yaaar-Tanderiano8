@@ -13,8 +13,8 @@ class Pirata {
     method estaPasadoDeGrog() = nivelDeEbriedad >= 90 
     method seAnimaASaquear(unObjetivo) = unObjetivo.puedeSerSaqueadoPor(self)
     method tieneNivelDeEbriedad(unNumero) = nivelDeEbriedad  >= unNumero
-    method beberGrog() {nivelDeEbriedad += 5} 
-    method gastar(unaCantidad) {cantidadDeDinero -= unaCantidad}
+    method beberGrog(cantidad) {nivelDeEbriedad += cantidad} 
+    method gastar(unaCantidad) {cantidadDeDinero = (cantidadDeDinero - unaCantidad).max(0)}
     method nivelDeEbriedad() = nivelDeEbriedad 
      
 }
@@ -36,14 +36,18 @@ class Barco {
         }
     method piratasQueNoCalificanParaMision(unaMision) = tripulantes.filter({p=> not p.esUtilParaMision(unaMision)})
     method anclar(unaCiudad) {
-        tripulantes.forEach({t=> t.beberGrog()})
-        tripulantes.forEach({t=> t.gastar(1)})
+        tripulantes.forEach({t=> t.beberGrog(5)}) /// posible subtarea
+        tripulantes.forEach({t=> t.gastar(1)}) /// posible subtarea
+        self.removerAlMasBorracho()
+        unaCiudad.aumentarHabitantes(1)
     }    
     method removerAlMasBorracho() {tripulantes.remove(self.pirataMasBorracho())}
     method pirataMasBorracho() = tripulantes.max({t=>t.nivelDeEbriedad()})
+    method puedeCompletarMision() = misionActual.barcoCumpleCondicion(self)
 }
 class Ciudad{
     var habitantes
+    method aumentarHabitantes(unaCantidad) {habitantes += unaCantidad}
     method puedeSerSaqueadoPor(unPirata) = unPirata.tieneNivelDeEbriedadMasQue(50)
     method esVulnerableA(unBarco) = unBarco.cantidadDeTripulantes() >= habitantes * 0.4 or unBarco.tripulacionPasadaDeGrog() 
 }
